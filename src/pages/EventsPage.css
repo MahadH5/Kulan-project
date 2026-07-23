@@ -1,0 +1,40 @@
+.events-page {
+  background: var(--color-bg);
+  min-height: 60vh;
+}
+
+.events-page__tabs {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+}
+
+.events-page__tab {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-body);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-sm);
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+}
+
+.events-page__tab:hover {
+  border-color: var(--color-brand-pink);
+  color: var(--color-text-heading);
+}
+
+.events-page__tab--active {
+  background: var(--color-black);
+  border-color: var(--color-black);
+  color: var(--color-white);
+}
+
+.events-page__tab--active:hover {
+  border-color: var(--color-black);
+  color: var(--color-white);
+}
+
+.events-page__grid {
+  padding-bottom: var(--space-3xl);
+}

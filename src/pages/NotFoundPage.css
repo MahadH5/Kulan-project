@@ -1,0 +1,46 @@
+.not-found {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-3xl) var(--container-padding);
+  background: var(--color-bg);
+}
+
+.not-found__code {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-black);
+  color: var(--color-brand-pink);
+}
+
+.not-found__heading {
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-black);
+  color: var(--color-text-heading);
+}
+
+.not-found__text {
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-md);
+  color: var(--color-text-body);
+  max-width: 420px;
+}
+
+.not-found__link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: var(--space-xl);
+  background: var(--color-black);
+  color: var(--color-white);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-sm);
+  padding: 12px 24px;
+  border-radius: var(--radius-pill);
+}
+
+.not-found__link:hover {
+  background: var(--color-brand-pink);
+}

@@ -1,0 +1,8 @@
+.cities-page {
+  background: var(--color-bg);
+  min-height: 60vh;
+}
+
+.cities-page__grid {
+  padding-bottom: var(--space-3xl);
+}
