@@ -6,6 +6,8 @@ import SignupPage from "./pages/SignupPage";
 import EventsPage from "./pages/EventsPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import CitiesPage from "./pages/CitiesPage";
+import DashboardPage from "./pages/DashboardPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
@@ -18,6 +20,14 @@ function App() {
         <Route path="events" element={<EventsPage />} />
         <Route path="categories" element={<CategoriesPage />} />
         <Route path="cities" element={<CitiesPage />} />
+        <Route
+          path="dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
