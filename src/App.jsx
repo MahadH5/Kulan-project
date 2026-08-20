@@ -7,6 +7,8 @@ import EventsPage from "./pages/EventsPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import CitiesPage from "./pages/CitiesPage";
 import DashboardPage from "./pages/DashboardPage";
+import ItemsPage from "./pages/ItemsPage";
+import ItemDetailPage from "./pages/ItemDetailPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFoundPage from "./pages/NotFoundPage";
 
@@ -20,6 +22,8 @@ function App() {
         <Route path="events" element={<EventsPage />} />
         <Route path="categories" element={<CategoriesPage />} />
         <Route path="cities" element={<CitiesPage />} />
+        <Route path="items" element={<ItemsPage />} />
+        <Route path="items/:id" element={<ItemDetailPage />} />
         <Route
           path="dashboard"
           element={
