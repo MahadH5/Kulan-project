@@ -1,31 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ITEMS_URL } from "../api/items";
+import { useItemsStore } from "../store/useItemsStore";
 import PageHeader from "../components/PageHeader";
 import "./ItemsPage.css";
 
 function ItemsPage() {
-  const [status, setStatus] = useState("loading");
-  const [items, setItems] = useState([]);
-  const [error, setError] = useState(null);
+  const items = useItemsStore((s) => s.items);
+  const status = useItemsStore((s) => s.status);
+  const loadItems = useItemsStore((s) => s.loadItems);
 
   useEffect(() => {
-    fetch(ITEMS_URL)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`Request failed with status ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setItems(data.products);
-        setStatus("success");
-      })
-      .catch((err) => {
-        setError(err.message);
-        setStatus("error");
-      });
-  }, []);
+    loadItems();
+  }, [loadItems]);
 
   return (
     <div className="items-page">
@@ -38,7 +24,7 @@ function ItemsPage() {
 
         {status === "error" && (
           <p className="items-page__state items-page__state--error">
-            {error}
+            Something went wrong while loading items.
           </p>
         )}
 
