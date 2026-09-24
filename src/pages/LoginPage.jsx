@@ -1,19 +1,30 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuthActions } from "@convex-dev/auth/react";
-import { ConvexError } from "convex/values";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { authPages } from "../data/siteData";
+import { useAuthStore } from "../store/useAuthStore";
 import AuthCard from "../components/AuthCard";
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function LoginPage() {
   const copy = authPages.login;
-  const { signIn } = useAuthActions();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [error, setError] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
+  const location = useLocation();
+  const login = useAuthStore((s) => s.login);
+  const setError = useAuthStore((s) => s.setError);
+  const error = useAuthStore((s) => s.error);
+  const submitting = useAuthStore((s) => s.status === "loading");
+  const [form, setForm] = useState({ username: "", password: "" });
+
+  // The store keeps the last auth error; drop any stale one on the way
+  // in and out so it doesn't flash on a fresh visit.
+  useEffect(() => {
+    const { clearError } = useAuthStore.getState();
+    clearError();
+    return clearError;
+  }, []);
+
+  // Where to send the user after a successful login: back to the page
+  // that bounced them here, or the dashboard by default.
+  const redirectTo = location.state?.from?.pathname || "/dashboard";
 
   function handleChange(field) {
     return (event) => {
@@ -24,37 +35,16 @@ function LoginPage() {
   async function handleSubmit(event) {
     event.preventDefault();
 
-    if (!form.email || !form.password) {
+    if (!form.username || !form.password) {
       setError("Please fill in both fields.");
       return;
     }
 
-    if (!EMAIL_PATTERN.test(form.email)) {
-      setError("Please enter a valid email address.");
-      return;
+    const ok = await login(form);
+    if (ok) {
+      navigate(redirectTo, { replace: true });
     }
-
-    setError(null);
-    setSubmitting(true);
-
-    try {
-      await signIn("password", {
-        email: form.email,
-        password: form.password,
-        flow: "signIn",
-      });
-      navigate("/dashboard");
-    } catch (err) {
-      console.error("Login failed:", err);
-      const message =
-        err instanceof ConvexError
-          ? err.data
-          : err?.message ||
-            "We couldn't log you in — check your email and password and try again.";
-      setError(message);
-    } finally {
-      setSubmitting(false);
-    }
+    // On failure the store already holds the error message.
   }
 
   return (
@@ -67,16 +57,16 @@ function LoginPage() {
     >
       <form onSubmit={handleSubmit} noValidate>
         <div className="auth-card__field">
-          <label className="auth-card__label" htmlFor="login-email">
-            {copy.emailLabel}
+          <label className="auth-card__label" htmlFor="login-username">
+            Username
           </label>
           <input
-            id="login-email"
-            type="email"
+            id="login-username"
+            type="text"
             className="auth-card__input"
-            value={form.email}
-            onChange={handleChange("email")}
-            autoComplete="email"
+            value={form.username}
+            onChange={handleChange("username")}
+            autoComplete="username"
           />
         </div>
 

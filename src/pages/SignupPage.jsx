@@ -1,19 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuthActions } from "@convex-dev/auth/react";
-import { ConvexError } from "convex/values";
 import { authPages } from "../data/siteData";
+import { useAuthStore } from "../store/useAuthStore";
 import AuthCard from "../components/AuthCard";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function SignupPage() {
   const copy = authPages.signup;
-  const { signIn } = useAuthActions();
   const navigate = useNavigate();
+  const signup = useAuthStore((s) => s.signup);
+  const setError = useAuthStore((s) => s.setError);
+  const error = useAuthStore((s) => s.error);
+  const submitting = useAuthStore((s) => s.status === "loading");
   const [form, setForm] = useState({ name: "", email: "", password: "" });
-  const [error, setError] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
+
+  // Clear any stale auth error on the way in and out.
+  useEffect(() => {
+    const { clearError } = useAuthStore.getState();
+    clearError();
+    return clearError;
+  }, []);
 
   function handleChange(field) {
     return (event) => {
@@ -39,28 +46,11 @@ function SignupPage() {
       return;
     }
 
-    setError(null);
-    setSubmitting(true);
-
-    try {
-      await signIn("password", {
-        name: form.name,
-        email: form.email,
-        password: form.password,
-        flow: "signUp",
-      });
-      navigate("/dashboard");
-    } catch (err) {
-      console.error("Signup failed:", err);
-      const message =
-        err instanceof ConvexError
-          ? err.data
-          : err?.message ||
-            "We couldn't create your account. Please try again.";
-      setError(message);
-    } finally {
-      setSubmitting(false);
+    const ok = await signup(form);
+    if (ok) {
+      navigate("/dashboard", { replace: true });
     }
+    // On failure the store already holds the error message.
   }
 
   return (

@@ -1,31 +1,48 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "convex/react";
-import { useAuthActions } from "@convex-dev/auth/react";
-import { api } from "../../convex/_generated/api";
+import { useAuthStore, isLocalToken } from "../store/useAuthStore";
+import { fetchCurrentUser } from "../api/auth";
 import PageHeader from "../components/PageHeader";
 import HowKulanWorks from "../components/HowKulanWorks";
 import "./DashboardPage.css";
 
 function DashboardPage() {
-  const user = useQuery(api.users.viewer);
-  const { signOut } = useAuthActions();
+  const user = useAuthStore((s) => s.user);
+  const token = useAuthStore((s) => s.token);
+  const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
 
-  async function handleSignOut() {
-    await signOut();
-    navigate("/");
+  // Confirm the token with the server and refresh the saved user.
+  // An expired token comes back 401, which logs the user out.
+  // Demo signup tokens aren't known to the server, so skip them.
+  useEffect(() => {
+    if (!token || isLocalToken(token)) return;
+
+    const controller = new AbortController();
+    fetchCurrentUser({ signal: controller.signal })
+      .then((me) => {
+        if (me) useAuthStore.getState().setUser(me);
+      })
+      .catch(() => {
+        // Aborted or offline: keep showing the saved user.
+      });
+
+    return () => controller.abort();
+  }, [token]);
+
+  function handleSignOut() {
+    logout();
+    // Send them to login rather than home: clearing the token would
+    // otherwise make ProtectedRoute bounce them there anyway.
+    navigate("/login", { replace: true });
   }
 
-  const firstName = user?.name?.split(" ")[0];
+  const firstName = user?.firstName || user?.username;
 
   return (
     <div className="dashboard-page">
       <PageHeader
-        heading={
-          user === undefined
-            ? "Welcome back"
-            : `Welcome back${firstName ? `, ${firstName}` : ""} \u{1F44B}`
-        }
+        heading={`Welcome back${firstName ? `, ${firstName}` : ""} \u{1F44B}`}
         subtext="Here's what's happening on Kulan."
       />
 
