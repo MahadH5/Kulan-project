@@ -1,5 +1,7 @@
 # Kulan
 
+https://kulan-project-w9qz.vercel.app
+
 A React + Vite clone of the Meetup-style homepage shown in the reference screenshot, rebranded as **Kulan**, expanded into a full small site. No messaging, payments, maps, comments, or admin dashboard.
 
 ## Run it
